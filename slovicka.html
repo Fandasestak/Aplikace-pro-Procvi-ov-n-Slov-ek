@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards App</title>
+<style>
+    body {
+      background: linear-gradient(grey 20%, black 80%) no-repeat center/cover fixed;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+ 
+    h1 {
+      text-align: center;
+    }
+ 
+    #flashcards_container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      text-align: right;
+      border: 2px solid navy;
+      border-radius: 5px;
+      padding: 5px;
+    }
+ 
+    .flashcard {
+      width: 200px;
+      height: 120px;
+      color: navy;
+      font-size: large;
+      border: 5px dotted navy;
+      border-radius: 5px;
+      position: relative;
+      cursor:cell;
+      transition: 1s;
+    }
+ 
+    .front, .back {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      position: absolute;
+      backface-visibility: hidden;
+    }
+ 
+    .back {
+      transform: rotateY(180deg);
+      background: none;
+    }
+    /* uprava tlačítek  */
+    .btn_, .input_english_word, .czech_translation, .input_explanation {
+      display: grid;
+      justify-content: space-evenly;
+      margin: 2px 0px 10px;
+    }
+    /*  */
+    #english_word, #czech_translation, #explanation {
+      text-align: center;
+      color: navy;
+      outline: none;
+      background: #111111;
+      border: none;
+      border-radius: 5px;
+    }
+    #english_word:hover, #czech_translation:hover, #explanation:hover {
+      text-decoration: underline;
+      text-decoration-color: navy;
+      transition: all 1s;
+    }
+    .btn{
+      color: navy;
+      background: none;
+      border: none;
+      transition: 555ms;
+      margin: 5px
+    }
+    .btn:hover {
+      font-size: 20px;
+      text-decoration: underline;
+      margin-bottom: 20px;
+      margin-top: 5px;
+    }
+    .flipped .front {
+      transform: rotateY(180deg);
+    }
+ 
+    .flipped .back {
+      transform: rotateY(0deg);
+    }
+    .edit {
+      text-align: center;
+      color:grey;
+      background: linear-gradient(rgb(49, 49, 150), rgb(35, 35, 173), black);
+      border: none;
+      border-radius:  5px;
+    }
+</style>
+</head>
+<body>
+<h1>Flashcards App</h1>
+
+<form id="flashcard-form">
+
+<div class="input_english_word">
+  <input type="text" id="english_word" placeholder="English Word" required>
+</div>
+
+<div class="czech_translation">
+  <input type="text" id="czech_translation" placeholder="Czech Translation" required>
+</div>
+
+<div class="input_explanation">
+  <input type="text" id="explanation" placeholder="Explanation" required>
+</div>
+
+<div class="btn_">
+  <button type="submit" class="btn">Add Flashcard</button>
+</div>
+
+</form>
+<div id="flashcards_container"></div>
+ 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const flashcardForm = document.getElementById('flashcard-form');
+      const flashcardsContainer = document.getElementById('flashcards_container');
+      let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
+ 
+      renderFlashcards();
+ 
+      flashcardForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+ 
+        const englishWord = document.getElementById('english_word').value.trim();
+        const czechTranslation = document.getElementById('czech_translation').value.trim();
+        const explanation = document.getElementById('explanation').value.trim();
+ 
+        if (englishWord && czechTranslation && explanation) {
+          const newFlashcard = {
+            englishWord: englishWord,
+            czechTranslation: czechTranslation,
+            explanation: explanation
+          };
+ 
+          flashcards.push(newFlashcard);
+          localStorage.setItem('flashcards', JSON.stringify(flashcards));
+ 
+          renderFlashcards();
+          flashcardForm.reset();
+        } else {
+          alert('Please fill in all fields.');
+        }
+      });
+ 
+      function renderFlashcards() {
+        flashcardsContainer.innerHTML = '';
+ 
+        flashcards.forEach(function(flashcard, index) {
+          const card = document.createElement('div');
+          textContent = 
+          card.classList.add('flashcard');
+ 
+          const front = document.createElement('div');
+          front.classList.add('front');
+          front.textContent = flashcard.englishWord;
+ 
+          const back = document.createElement('div');
+          back.classList.add('back');
+          back.textContent = `${flashcard.czechTranslation} - ${flashcard.explanation}`;
+ 
+          card.appendChild(front);
+          card.appendChild(back);
+
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete';
+          deleteButton.classList.add('edit');
+          deleteButton.addEventListener('click', function() {
+            const index = 1;
+            if (index !== -1 && index < flashcards.length) {
+              flashcards.splice(index, 1);
+              localStorage.setItem('flashcards', JSON.stringify(flashcards));
+              renderFlashcards();
+  } else {
+    console.error('Neplatný index položky');
+  }
+});
+
+document.body.appendChild(deleteButton);
+
+ 
+          card.appendChild(deleteButton);
+ 
+          card.addEventListener('click', function() {
+            card.classList.toggle('flipped');
+          });
+ 
+          flashcardsContainer.appendChild(card);
+        });
+      }
+    });
+</script>
+</body>
+</html>
